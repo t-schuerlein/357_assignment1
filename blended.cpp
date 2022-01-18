@@ -40,14 +40,13 @@ unsigned char get_red(unsigned char *arr, int x, int y, int byWidth){
 }
 
 // take in floating pixel, return avg of 4 pixels
-Byte* bilinear(unsigned char *idata,float mapX,float mapY,int
-width2, int bigWidth, int height2, int bigHeight){
+Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2){
     
             Byte *result = new Byte[3];
   
-            if(mapX > width2 || mapY > height2){
-                printf("this is bad\n");
-            }
+            // if(mapX > width2 || mapY > height2){
+            //     // printf("this is bad\n");
+            // }
           
            int xLow = (int) mapX;
            int xHigh = xLow + 1;
@@ -191,6 +190,7 @@ int setResSize(int *width1, int *height1, int *width2, int *height2, int *width,
         *width = *width1;
         *height = *height1;
     } else {
+        printf("res size says that image 2 is bigger\n");
         *width = *width2;
         *height = *height2;
     }
@@ -235,10 +235,39 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 
     Byte *result = new Byte[setResSize(&width1,&height1, &width2, &height2, &bigWidth, &bigHeight)];
 
-    for(int y = 0; y < bigHeight; y++){
-        //TODO pixel width is hardcoded in
+    Byte* noChange;
+    Byte* scale;
+    int smallWidth;
+    int smallHeight;
+  
+     if(width1 == bigWidth){
+                printf("big width is 1\n");
+                noChange = idata;
+                scale = idata2;
+
+                smallWidth = width2;
+                smallHeight = height2;
+       
+            } else{
+                printf("big width is 2\n");
+                 noChange = idata2; 
+                 scale = idata;
+
+                 smallWidth = width1;
+                 smallHeight = height1;
+              
+            }
+
+
+        printf("small width: %d small height: %d big width: %d big height: %d\n", smallWidth, smallHeight, bigWidth, bigHeight);
+
+
+
+    for(int y = 0; y < 768; y++){
+        
         for(int x = 0; x < 1024; x++){
 
+           
             //simple copy of first image
             Byte regG = get_green(idata, x, y, bigWidth);
             Byte regB = get_blue(idata, x, y, bigWidth);
@@ -246,11 +275,11 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 
 
             // trying to convert 2nd pic to big width and height
-            float mapX = (x) * ((float) width2/ bigWidth);
-            float mapY = y * ((float) height2 / bigHeight);
+            float mapX = x * ((float) smallWidth / bigWidth);
+            float mapY = y * ((float) smallHeight / bigHeight);
             Byte *avgPix = new Byte[3];
             
-            avgPix = (Byte *) bilinear(idata2, mapX,mapY,width2, bigWidth, height2, bigHeight);
+            avgPix = (Byte *) bilinear(scale, mapX,mapY,smallWidth);
 
 
             // printf("regG: %d ratio1: %f -> regG*ratio1=%f\n", regG, ratio1, regG * ratio1);
@@ -293,6 +322,17 @@ int main(int argc, char *argv[]){
 
     readHeader(bfh2, bih2, file2);
     
+    int resPiWidth;
+    BITMAPINFOHEADER resInfo;
+    if (bih1.biWidth > bih2.biWidth){
+        resPiWidth = bih1.biWidth;
+        resInfo = bih1;
+    } else{
+        resPiWidth = bih2.biWidth;
+        resInfo = bih2;
+    }
+
+    printf("RES PI WIDTH IS %d ", resPiWidth);
 
     int width1 = ByWidthPadding(bih1.biWidth);
     int height1 = bih1.biHeight;
@@ -323,7 +363,7 @@ int main(int argc, char *argv[]){
 //    // the resulting output color array
     Byte *result = new Byte[resSize];
 
-    printf("size1: %d size2: %d and resSize: %d", size1, size2, resSize);
+    printf("size1: %d size2: %d and resSize: %d\n", size1, size2, resSize);
 
 
 //    //  // printf("fixed width: %d\n", bigByWidth);
@@ -334,23 +374,35 @@ int main(int argc, char *argv[]){
 
 //    result = sameSize(idata, idata2, width1,height1,ratio1);
 // result = diffSize(idata, idata2, width1, width2, height1, height2, ratio1);
-result = diff3(idata, idata2, bih1.biWidth,width1,  width2, height1, height2, ratio1);
+result = diff3(idata, idata2, resPiWidth,width1,  width2, height1, height2, ratio1);
 
 // result = same3(idata, idata2, bih1.biWidth, height1, ratio1);
 
 
+    
+    
 
+
+
+        fwrite(&bfh2.bfType, 2, 1, res);
+    fwrite(&bfh2.bfSize, 4, 1, res);
+    fwrite(&bfh2.bfReserved1, sizeof(short), 1 , res);
+    fwrite(&bfh2.bfReserved2, sizeof(short), 1, res);
+    fwrite(&bfh2.bfOffBits, sizeof(int), 1, res);
     
-    
-    fwrite(&bfh1.bfType, 2, 1, res);
-    fwrite(&bfh1.bfSize, 4, 1, res);
-    fwrite(&bfh1.bfReserved1, sizeof(short), 1 , res);
-    fwrite(&bfh1.bfReserved2, sizeof(short), 1, res);
-    fwrite(&bfh1.bfOffBits, sizeof(int), 1, res);
-    
-    fwrite(&bih1, sizeof(bih1), 1, res);
+    fwrite(&resInfo, sizeof(resInfo), 1, res);
 
     fwrite(result, resSize, 1, res);
+    
+    // fwrite(&bfh1.bfType, 2, 1, res);
+    // fwrite(&bfh1.bfSize, 4, 1, res);
+    // fwrite(&bfh1.bfReserved1, sizeof(short), 1 , res);
+    // fwrite(&bfh1.bfReserved2, sizeof(short), 1, res);
+    // fwrite(&bfh1.bfOffBits, sizeof(int), 1, res);
+    
+    // fwrite(&bih1, sizeof(bih1), 1, res);
+
+    // fwrite(result, resSize, 1, res);
 
 
     delete[] idata;
