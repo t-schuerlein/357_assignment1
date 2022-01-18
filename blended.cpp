@@ -26,17 +26,17 @@ int ByWidthPadding(int pixWidth){
 unsigned char get_color(unsigned char *arr, int x, int y, int byWidth){
     return arr[x + y * byWidth];
 }
-
+//TODO mult x by 3 here instead of outside method so we can exclusively talk about pixels
 unsigned char get_green(unsigned char *arr, int x, int y, int byWidth){
-    return arr[x + y * byWidth];
+    return arr[x*3 + y * byWidth];
 }
-
+//TODO mult x by 3 here instead of outside method so we can exclusively talk about pixels
 unsigned char get_blue(unsigned char *arr, int x, int y, int byWidth){
-    return arr[x+1 + y * byWidth];
+    return arr[(x*3)+1 + y * byWidth];
 }
-
+//TODO mult x by 3 here instead of outside method so we can exclusively talk about pixels
 unsigned char get_red(unsigned char *arr, int x, int y, int byWidth){
-    return arr[x+2 + y * byWidth];
+    return arr[(x*3)+2 + y * byWidth];
 }
 
 // take in floating pixel, return avg of 4 pixels
@@ -60,20 +60,20 @@ width2, int bigWidth, int height2, int bigHeight){
             // printf("here is test of floor: %d and ceil: %d\n", floor(mapX), ceil(mapX));
 
             // getting color from upper left pixel
-            Byte green_left_upper = get_green(idata, xLow*3, yHigh, width2);
-            Byte green_left_lower = get_green(idata, xLow*3, yLow, width2);
-            Byte green_right_upper = get_green(idata, (xHigh)*3, yHigh, width2);
-            Byte green_right_lower = get_green(idata, 3*xHigh, yLow, width2);
+            Byte green_left_upper = get_green(idata, xLow, yHigh, width2);
+            Byte green_left_lower = get_green(idata, xLow, yLow, width2);
+            Byte green_right_upper = get_green(idata, (xHigh), yHigh, width2);
+            Byte green_right_lower = get_green(idata, xHigh, yLow, width2);
 
             Byte green_left = green_left_upper * ( 1 - dy) + green_left_lower * (dy);
             Byte green_right = green_right_upper * (1 - dy) + green_right_lower * (dy);
             Byte green_avg = (Byte)(green_left * (float)(1-dx) + (float)green_right * dx);
             result[0] = green_avg;
 
-            Byte blue_left_upper = get_blue(idata, xLow*3, yHigh, width2);
-            Byte blue_left_lower = get_blue(idata, xLow*3, yLow, width2);
-            Byte blue_right_upper = get_blue(idata, (xHigh)*3, yHigh, width2);
-            Byte blue_right_lower = get_blue(idata, 3*xHigh, yLow, width2);
+            Byte blue_left_upper = get_blue(idata, xLow, yHigh, width2);
+            Byte blue_left_lower = get_blue(idata, xLow, yLow, width2);
+            Byte blue_right_upper = get_blue(idata, (xHigh), yHigh, width2);
+            Byte blue_right_lower = get_blue(idata, xHigh, yLow, width2);
 
             Byte blue_left = blue_left_upper * ( 1 - dy) + blue_left_lower * (dy);
             Byte blue_right = blue_right_upper * (1 - dy) + blue_right_lower * (dy);
@@ -81,10 +81,10 @@ width2, int bigWidth, int height2, int bigHeight){
             result[1] = blue_avg;
 
 
-            Byte red_left_upper = get_red(idata, xLow*3, yHigh, width2);
-            Byte red_left_lower = get_red(idata, xLow*3, yLow, width2);
-            Byte red_right_upper = get_red(idata, (xHigh)*3, yHigh, width2);
-            Byte red_right_lower = get_red(idata, 3*xHigh, yLow, width2);
+            Byte red_left_upper = get_red(idata, xLow, yHigh, width2);
+            Byte red_left_lower = get_red(idata, xLow, yLow, width2);
+            Byte red_right_upper = get_red(idata, (xHigh), yHigh, width2);
+            Byte red_right_lower = get_red(idata, xHigh, yLow, width2);
 
             Byte red_left = red_left_upper * ( 1 - dy) + red_left_lower * (dy);
             Byte red_right = red_right_upper * (1 - dy) + red_right_lower * (dy);
@@ -227,7 +227,7 @@ unsigned char* diffSize(unsigned char *idata, unsigned char *idata2, int width1,
     return result;
 }
 
-
+//TODO ratio won't work, but hardcoded float will
 unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, int width1, int width2, int height1, int height2, float ratio1){
 
     int bigWidth;
@@ -236,7 +236,15 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
     Byte *result = new Byte[setResSize(&width1,&height1, &width2, &height2, &bigWidth, &bigHeight)];
 
     for(int y = 0; y < bigHeight; y++){
-        for(int x = 0; x < 1280; x++){
+        //TODO pixel width is hardcoded in
+        for(int x = 0; x < 1024; x++){
+
+            //simple copy of first image
+            Byte regG = get_green(idata, x, y, bigWidth);
+            Byte regB = get_blue(idata, x, y, bigWidth);
+            Byte regR = get_red(idata, x ,y , bigWidth);
+
+
             // trying to convert 2nd pic to big width and height
             float mapX = (x) * ((float) width2/ bigWidth);
             float mapY = y * ((float) height2 / bigHeight);
@@ -244,17 +252,13 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
             
             avgPix = (Byte *) bilinear(idata2, mapX,mapY,width2, bigWidth, height2, bigHeight);
 
-            result[(x*3)+y*bigWidth] = avgPix[0];
-            result[(x*3)+1 + y * bigWidth] = avgPix[1];
-            result[(x*3)+2 + y * bigWidth] = avgPix[2];
-            // result[(x*3)+1 +y*bigWidth] = bilinear(idata2, mapX+1,mapY,width2, bigWidth, height2, bigHeight);
-            // result[(x*3)+2+y*bigWidth] = bilinear(idata2, mapX+2,mapY,width2, bigWidth, height2, bigHeight);
-            //trying with just x scaling
-            
-            if( x == piWidth){
-           
-           
-           }
+
+            // printf("regG: %d ratio1: %f -> regG*ratio1=%f\n", regG, ratio1, regG * ratio1);
+
+            result[(x*3)+0 + y * bigWidth] = regG * ratio1 + avgPix[0] * (1-ratio1);
+            result[(x*3)+1 + y * bigWidth] = regB * ratio1 + avgPix[1] * (1-ratio1);
+            result[(x*3)+2 + y * bigWidth] = regR * ratio1 + avgPix[2] * (1-ratio1);
+
 
         }
     }
@@ -265,14 +269,18 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 // arguments: programName, img1, img2, ratio, outputFileName
 int main(int argc, char *argv[]){
 
+    for(int i = 0; i < argc; i ++){
+        printf("%s\n", argv[i]);
+    }
+
     FILE *res = fopen("res.bmp", "wb");
 
     
     float ratio1 = 0.5;
-    float ratio2 = 0.5;
 
 
-    FILE *file = fopen("blendimages/jar.bmp", "rb");
+
+    FILE *file = fopen("blendimages/lion.bmp", "rb");
     FILE *file2 = fopen("blendimages/flowers.bmp", "rb");
 
     BITMAPFILEHEADER bfh1;
@@ -285,7 +293,6 @@ int main(int argc, char *argv[]){
 
     readHeader(bfh2, bih2, file2);
     
-    printf("\npixel width of tunnel should be 1005 but is %d\n", bih2.biWidth);
 
     int width1 = ByWidthPadding(bih1.biWidth);
     int height1 = bih1.biHeight;
@@ -299,38 +306,7 @@ int main(int argc, char *argv[]){
     int resSize = setResSize(&width1, &height1, &width2, &height2, resPW, resPH);
 
 
-    // padding the bytes, not the pixels. The bytes need to be divisible by 4
-    // int bigByWidth;
-    // int littleByWidth;
-    // int height;
-    // int big;
-    // if(bih1.biWidth > bih2.biWidth){
-    //     bigByWidth = ByWidthPadding(bih1.biWidth);
-    //     littleByWidth = ByWidthPadding(bih2.biWidth);
-    //     height = bih1.biHeight;
-    //     big = 1;
-    // } else {
-    //     bigByWidth = ByWidthPadding(bih2.biWidth);
-    //     littleByWidth = ByWidthPadding(bih2.biWidth);
-    //     height = bih2.biHeight;
-    //     big = 2;
-    // }
-
-    // // // bigSize gives us the # of color bytes in image
-    // // // height * real_width * bytes_per_pixel
-
     
-    // int bigSize;
-    // int littleSize;
-    // if( big == 1){
-    //     bigSize = bigByWidth*bih1.biHeight;
-      
-    // } else {
-    //     bigSize = bigByWidth*bih2.biHeight;
-        
-    // }
-   
-//    // getting the color array of image
 
     printf("res width w/ padding:%d height:%d size:%d\n", resWidth, resHeight, resSize);
 
@@ -345,14 +321,10 @@ int main(int argc, char *argv[]){
 
     
 //    // the resulting output color array
-    // Byte *result = new Byte[resSize];
     Byte *result = new Byte[resSize];
 
     printf("size1: %d size2: %d and resSize: %d", size1, size2, resSize);
 
-    // printf("ratio1: %f ratio2: %f\n", ratio1, ratio2);
-
-    
 
 //    //  // printf("fixed width: %d\n", bigByWidth);
 //    //  // printf("image bigSize is %d \n",  bih1.biSizeImage);
@@ -367,148 +339,6 @@ result = diff3(idata, idata2, bih1.biWidth,width1,  width2, height1, height2, ra
 // result = same3(idata, idata2, bih1.biWidth, height1, ratio1);
 
 
-    // for(int y = 0; y < resHeight; y++){
-    //     for(int x = 0; x < resWidth; x++){
-    //         Byte curr = idata[x + y*width1];
-    //         // Byte curr2 = idata2[x + y*width2];
-
-
-    //         float wFrac = (float ) width2 / (float) resWidth;
-    //         float yFrac = (float) height2 / (float) resHeight;
-        
-    //         float xf = ((float) x) * wFrac;
-    //         float yf = ((float) y ) * yFrac;
-
-    //         // int xR = ceil(xf);
-    //         // int xL = floor(xf);
-
-    //         // float dx = xf - (float)xL;
-
-
-
-    //         // Byte left = idata2[ (int) ( xL + y * width2)   ];
-    //         // Byte right = idata2[  (int)  (xR + y * width2   )   ];
-
-            
-    //         // Byte avg = left * 0.5 + right * 0.5;
-
-    //         // if(avg == 0 && y == 0 && xf < 1005){
-                
-    //         // printf("\nxf: %f little xR: %d big xL: %d float dx: %f\n", xf,  xR, xL, dx);
-    //         //     printf("gen_color: %d left: %d right: %d avg: %d\n", idata2[xL + y*littleByWidth], left, right, avg);
-    //         // }
-
-    //         // result[x + y *resWidth] = avg;
-
-    //         // printf("x is %d. xf is %f\n", x, xf);
-
-    //         if (bilinear(idata2, xf,yf, width2,height2) == 0){
-    //             numBlack += 1;
-    //         }
-
-    //         result[x+y*resWidth] = bilinear(idata2, xf,yf, width2,height2);
-
-
-    //     }
-    // }
-
-    // printf("numBlack is %d\n", numBlack);
-
-
-//    for(int y = 0; y < height; y ++){
-//       for(int x = 0; x < bigByWidth; x++){
-            
-//         Byte curr = idata[x + y*bigByWidth];
-//         Byte curr2 = idata2[x + y*bigByWidth];
-//         if( big == 1){
-//             curr = idata[x + y * bigByWidth];
-
-
-
-//             float x2 = x * (bih2.biWidth / (float) bih1.biWidth);
-//             // float y2 = y * (bih2.biHeight / (float)bih1.biHeight);
-    
-//             // printf("calc x: %f y:%f\n", x2, y2);
-//             // xS = x_small xL = x_large
-//             int xL = ceil(x2);
-//             int xS = floor(x2);
-//             // int yL = ceil(y2);
-//             // int yS = floor(y2);
-
-//             float dx = x2 - ((float)  xS );
-//             // float dy = y2 - ((float)  yS );
-
-            
-//             // printf("x: %f y:%f dx:%f dy:%f\n", x2, y2, dx, dy);
-
-//             Byte color_upper_left = idata2[xS + y * bigByWidth];
-//             Byte color_upper_right = idata2[xL + y * bigByWidth];
-//             Byte color_lower_left = idata2[xL + y * bigByWidth];
-//             Byte color_lower_right = idata2[xS + y * bigByWidth];
-
-//             Byte color_left = color_upper_left * (0.5) + color_lower_left * 0.5;
-            
-//             Byte color_right = color_upper_right * (0.5) + color_lower_right * 0.5;
-
-
-
-//             Byte color_result = color_left * (0.5) + color_right * 0.5;
-
-
-//             // result[x+ y *bigByWidth] = (curr * ratio1) + (color_result * ratio2);
-//             result[x+ y*bigByWidth] = color_result;
-
-
-//         }
-
-//         // else {
-
-//         //     curr2 = idata2[x+ y *bigByWidth];
-//         //     float x1;
-//         //     float y1;
-
-//         //     x1 = x * (bih1.biWidth/ (float)  bih2.biWidth);
-//         //     y1 = y * (bih1.biWidth/  (float) bih2.biWidth);
-//         //     // xS = x_small xL = x_large
-//         //     int xL = ceil(x1);
-//         //     int xS = floor(x1);
-//         //     int yL = ceil(y1);
-//         //     int yS = floor(y1);
-
-//         //     float dx = x1 - ( (float) xS);
-//         //     float dy = y1 - ( (float ) yS);
-
-//         //     Byte color_upper_left = idata[xS + yL * bigByWidth];
-//         //     Byte color_upper_right = idata[xL + yL * bigByWidth];
-//         //     Byte color_lower_left = idata[xL + yS * bigByWidth];
-//         //     Byte color_lower_right = idata[xS + yS * bigByWidth];
-
-//         //     Byte color_left = color_upper_left * (1-dy) + color_lower_left * dy;
-//         //     Byte color_right = color_upper_right * (1 -dy) + color_lower_right * dy;
-//         //     Byte color_result = color_left * (1-dx) + color_right * dx;
-
-//         //     result[x+ y *bigByWidth] = (color_result * ratio1) + (curr2 * ratio2);
-
-
-//         // }
-         
-//         //  result[x + y * bigByWidth ] = (curr*ratio1) + (curr2*ratio2);
-//    //  //         result[x*3 + y * bigByWidth * 3 + 1] = g;
-//    //  //         result[x*3 + y * bigByWidth* 3 + 2] = r;
-
-//       }
-//    }
-
-    
-    // fwrite(&bfh1.bfType, 2, 1, res);
-    // fwrite(&bfh1.bfSize, 4, 1, res);
-    // fwrite(&bfh1.bfReserved1, sizeof(short), 1, res);
-    // fwrite(&bfh1.bfReserved2, sizeof(short), 1, res);
-    // fwrite(&bfh1.bfOffBits, sizeof(int), 1, res);
-    // // reading in bitmap info header
-    // fwrite(&bih1, sizeof(bih1), 1, res);
-
-    // fwrite(result, sizeof(result), 1, res);
 
     
     
@@ -524,8 +354,10 @@ result = diff3(idata, idata2, bih1.biWidth,width1,  width2, height1, height2, ra
 
 
     delete[] idata;
+    delete[] idata2;
     delete[] result;
     fclose(file);
+    fclose(file2);
     fclose(res);
     return 0;
 }
