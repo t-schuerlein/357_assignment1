@@ -22,6 +22,10 @@ int ByWidthPadding(int pixWidth){
     return bigByWidth;
 }
 
+void args_check(int argc, char** argv){
+
+}
+
 
 unsigned char get_color(unsigned char *arr, int x, int y, int byWidth){
     return arr[x + y * byWidth];
@@ -263,9 +267,9 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 
 
 
-    for(int y = 0; y < 768; y++){
+    for(int y = 0; y < bigHeight; y++){
         
-        for(int x = 0; x < 1024; x++){
+        for(int x = 0; x < piWidth; x++){
 
            
             //simple copy of first image
@@ -302,6 +306,8 @@ int main(int argc, char *argv[]){
         printf("%s\n", argv[i]);
     }
 
+    args_check(argc, argv);
+
     FILE *res = fopen("res.bmp", "wb");
 
     
@@ -310,7 +316,7 @@ int main(int argc, char *argv[]){
 
 
     FILE *file = fopen("blendimages/lion.bmp", "rb");
-    FILE *file2 = fopen("blendimages/flowers.bmp", "rb");
+    FILE *file2 = fopen("blendimages/wolf.bmp", "rb");
 
     BITMAPFILEHEADER bfh1;
     BITMAPINFOHEADER bih1;
