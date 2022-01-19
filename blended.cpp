@@ -8,7 +8,6 @@ using namespace std;
 
 //TODO argument handling 
 //TODO print out explanation of function
-//FIXME try to prevent upper right red and upper right blue from causing read error
 
 
 // defining a Byte
@@ -53,18 +52,24 @@ int ByWidthPadding(int pixWidth){
 }
 
 
-unsigned char get_green(unsigned char *arr, int x, int y, int byWidth){
+unsigned char get_green(unsigned char *arr, int x, int y, int byWidth, int arrSize){
+    if( arrSize <= (x*3) + 2 + y * byWidth ){
+        return 255/2;
+    }
     return arr[x*3 + y * byWidth];
 }
 
-unsigned char get_blue(unsigned char *arr, int x, int y, int byWidth){
+unsigned char get_blue(unsigned char *arr, int x, int y, int byWidth, int arrSize){
+    if( arrSize <= (x*3) + 2 + y * byWidth ){
+        return 255/2;
+    }
     return arr[(x*3)+1 + y * byWidth];
 }
 
-unsigned char get_red(unsigned char *arr, int x, int y, int byWidth){
-  
-    if( (3*1005 * 754) > (x*3) + 2 + y * byWidth ){
-        // printf("x: %d y:%d\n", x, y);
+unsigned char get_red(unsigned char *arr, int x, int y, int byWidth, int arrSize){
+ 
+    if( arrSize <= (x*3) + 2 + y * byWidth ){
+        return 255/2;
     }
     return arr[(x*3)+2 + y * byWidth];
 }
@@ -73,7 +78,7 @@ unsigned char get_red(unsigned char *arr, int x, int y, int byWidth){
 Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height2){
 
             Byte *result = new Byte[3];
-
+       int smallSize = width2 * height2;
          
 
            int xLow = (int) mapX;
@@ -87,20 +92,20 @@ Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height
             // printf("here is test of floor: %d and ceil: %d\n", floor(mapX), ceil(mapX));
 
             // getting color from upper left pixel
-            Byte green_left_upper = get_green(idata, xLow, yHigh, width2);
-            Byte green_left_lower = get_green(idata, xLow, yLow, width2);
-            Byte green_right_upper = get_green(idata, (xHigh), yHigh, width2);
-            Byte green_right_lower = get_green(idata, xHigh, yLow, width2);
+            Byte green_left_upper = get_green(idata, xLow, yHigh, width2,smallSize);
+            Byte green_left_lower = get_green(idata, xLow, yLow, width2,smallSize);
+            Byte green_right_upper = get_green(idata, (xHigh), yHigh, width2,smallSize);
+            Byte green_right_lower = get_green(idata, xHigh, yLow, width2,smallSize);
 
             Byte green_left = green_left_upper * ( 1 - dy) + green_left_lower * (dy);
             Byte green_right = green_right_upper * (1 - dy) + green_right_lower * (dy);
             Byte green_avg = (Byte)(green_left * (float)(1-dx) + (float)green_right * dx);
             result[0] = green_avg;
 
-            Byte blue_left_upper = get_blue(idata, xLow, yHigh, width2);
-            Byte blue_left_lower = get_blue(idata, xLow, yLow, width2);
-            Byte blue_right_upper =  get_blue(idata, xHigh, yHigh, width2);
-            Byte blue_right_lower = get_blue(idata, xHigh, yLow, width2);
+            Byte blue_left_upper = get_blue(idata, xLow, yHigh, width2,smallSize);
+            Byte blue_left_lower = get_blue(idata, xLow, yLow, width2,smallSize);
+            Byte blue_right_upper =  get_blue(idata, xHigh, yHigh, width2,smallSize);
+            Byte blue_right_lower = get_blue(idata, xHigh, yLow, width2,smallSize);
 
             Byte blue_left = blue_left_upper * ( 1 - dy) + blue_left_lower * (dy);
             Byte blue_right = blue_right_upper * (1 - dy) + blue_right_lower * (dy);
@@ -109,16 +114,16 @@ Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height
 
 
 
-            Byte red_left_upper = get_red(idata, xLow, yHigh, width2);
-            Byte red_left_lower = get_red(idata, xLow, yLow, width2);
+            Byte red_left_upper = get_red(idata, xLow, yHigh, width2,smallSize);
+            Byte red_left_lower = get_red(idata, xLow, yLow, width2,smallSize);
             
 
     
 
             
 
-            Byte red_right_upper = get_red(idata, (xHigh), yHigh, width2);
-Byte red_right_lower = get_red(idata, xHigh, yLow, width2);
+            Byte red_right_upper = get_red(idata, (xHigh), yHigh, width2,smallSize);
+Byte red_right_lower = get_red(idata, xHigh, yLow, width2,smallSize);
             
             
             
@@ -189,15 +194,17 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
                  smallHeight = height1;
             }
 
+ 
+
         // printf("small width: %d small height: %d big width: %d big height: %d\n", smallWidth, smallHeight, bigWidth, bigHeight);
 
     for(int y = 0; y < bigHeight; y++){
         for(int x = 0; x < piWidth; x++){
 
             //simple copy of first image
-            Byte regG = get_green(noChange, x, y, bigWidth);
-            Byte regB = get_blue(noChange, x, y, bigWidth);
-            Byte regR = get_red(noChange, x ,y , bigWidth);
+            Byte regG = get_green(noChange, x, y, bigWidth, (bigHeight*bigWidth));
+            Byte regB = get_blue(noChange, x, y, bigWidth, (bigHeight*bigWidth));
+            Byte regR = get_red(noChange, x ,y , bigWidth, (bigHeight*bigWidth));
 
 
             // trying to convert 2nd pic to big width and height
@@ -257,8 +264,8 @@ int main(int argc, char *argv[]){
 
     float ratio1 = 0.5;
 
-    FILE *file = fopen("blendimages/jar.bmp", "rb");
-    FILE *file2 = fopen("blendimages/tunnel.bmp", "rb");
+    FILE *file = fopen("wolf.bmp", "rb");
+    FILE *file2 = fopen("lion.bmp", "rb");
 
     BITMAPFILEHEADER bfh1;
     BITMAPINFOHEADER bih1;
@@ -295,11 +302,11 @@ int main(int argc, char *argv[]){
     // printf("res width w/ padding:%d height:%d size:%d\n", resWidth, resHeight, resSize);
 
     int size1 = width1 * height1;
-    Byte *idata = new Byte[ size1];
+    Byte *idata = new Byte[size1];
     fread(idata, size1, 1, file);
 
 
-    printf("size of idata is %d", size1);
+    
 
     int size2 = width2 * height2;
     Byte *idata2 = new Byte[ size2];
@@ -307,7 +314,7 @@ int main(int argc, char *argv[]){
 
 
 
-    // printf("size1: %d size2: %d and resSize: %d\n", size1, size2, resSize);
+    printf("size1: %d size2: %d and resSize: %d\n", size1, size2, resSize);
 
 
     Byte* result = diff3(idata, idata2, resPiWidth,width1,  width2, height1, height2, ratio1);
