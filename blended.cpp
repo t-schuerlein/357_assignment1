@@ -6,8 +6,8 @@
 
 using namespace std;
 
-//TODO argument handling 
-//TODO print out explanation of function
+//TODO argument handling do we just want to kill the program if bad arguments??
+
 
 
 // defining a Byte
@@ -78,13 +78,13 @@ unsigned char get_red(unsigned char *arr, int x, int y, int byWidth, int arrSize
 Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height2){
 
             Byte *result = new Byte[3];
-       int smallSize = width2 * height2;
+            int smallSize = width2 * height2;
          
 
-           int xLow = (int) mapX;
-           int xHigh = xLow + 1;
-           int yLow = (int) mapY;
-           int yHigh = yLow + 1;
+            int xLow = (int) mapX;
+            int xHigh = xLow + 1;
+            int yLow = (int) mapY;
+            int yHigh = yLow + 1;
 
             float dx = mapX - floor(mapX);
             float dy = mapY - floor(mapY);
@@ -102,6 +102,8 @@ Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height
             Byte green_avg = (Byte)(green_left * (float)(1-dx) + (float)green_right * dx);
             result[0] = green_avg;
 
+
+
             Byte blue_left_upper = get_blue(idata, xLow, yHigh, width2,smallSize);
             Byte blue_left_lower = get_blue(idata, xLow, yLow, width2,smallSize);
             Byte blue_right_upper =  get_blue(idata, xHigh, yHigh, width2,smallSize);
@@ -116,17 +118,8 @@ Byte* bilinear(unsigned char *idata,float mapX,float mapY,int width2, int height
 
             Byte red_left_upper = get_red(idata, xLow, yHigh, width2,smallSize);
             Byte red_left_lower = get_red(idata, xLow, yLow, width2,smallSize);
-            
-
-    
-
-            
-
             Byte red_right_upper = get_red(idata, (xHigh), yHigh, width2,smallSize);
-Byte red_right_lower = get_red(idata, xHigh, yLow, width2,smallSize);
-            
-            
-            
+            Byte red_right_lower = get_red(idata, xHigh, yLow, width2,smallSize);
 
             Byte red_left = red_left_upper * ( 1 - dy) + red_left_lower * (dy);
             Byte red_right = red_right_upper * (1 - dy) + red_right_lower * (dy);
@@ -228,6 +221,10 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 // arguments: programName, img1, img2, ratio, outputFileName
 int main(int argc, char *argv[]){
 
+
+    //print out of explanation
+    printf("\n\nThis is an image blender program. The program requires the following terminal arguments:\nprogramName, img1.bmp, img2.bmp, ratio, outputFileName.bmp\nThe ratio will tell the program what percent of the first image will go into the output and the rest of the blend will consist of the second image.\n\n");
+
     // argument handling
     // if(argc < 5){
     //     printf("not enough arguments\n");
@@ -246,7 +243,6 @@ int main(int argc, char *argv[]){
 
 //print how to use function
 
-    // float ratio1 = atof(argv[3]);
 
     // if(!file2){
     //     printf("could NOT open image 2\n");
@@ -258,6 +254,12 @@ int main(int argc, char *argv[]){
     // }
 
 
+    // float ratio1 = atof(argv[3]);
+
+    // if(ratio1 > 1 || ratio1 < 0){
+    //     printf("ratio is out of bounds, chose a value between 0 and 1");
+    //     return 1;
+    // }
 
     FILE *res = fopen("res.bmp", "wb");
 
