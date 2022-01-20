@@ -226,48 +226,61 @@ int main(int argc, char *argv[]){
     printf("\n\nThis is an image blender program. The program requires the following terminal arguments:\nprogramName, img1.bmp, img2.bmp, ratio, outputFileName.bmp\nThe ratio will tell the program what percent of the first image will go into the output and the rest of the blend will consist of the second image.\n\n");
 
     // argument handling
-    // if(argc < 5){
-    //     printf("not enough arguments\n");
-    //     return 1;
-    // }
-    // FILE *file = fopen(argv[1], "rb");
-    // FILE *file2 = fopen(argv[2], "rb");
-    // FILE *res = fopen(argv[4], "wb");
+    while(argc < 5){
+        printf("not enough arguments: %d. Input: [img1].bmp [img2].bmp ratio [output].bmp\n", argc);
+        scanf("%s %s %s %s", argv[1], argv[2], argv[3], argv[4]);
+    }
+    while(argc > 5){
+        printf("too many arguments. Input: [img1].bmp [img2].bmp ratio [output].bmp\n");
+        scanf("%s %s %s %s", argv[1], argv[2], argv[3], argv[4]);
+    }
+    FILE *file = fopen(argv[1], "rb");
+    FILE *file2 = fopen(argv[2], "rb");
+    FILE *res = fopen(argv[4], "wb");
 
-    // if(!file){
-    //     printf("could NOT open image 1\n");
-    //     return 1;
-    // }
-
-//valgrind
-
-//print how to use function
-
-
-    // if(!file2){
-    //     printf("could NOT open image 2\n");
-    //     return 1;
-    // }
-    // if(!res){
-    //     printf("could NOT open output file");
-    //     return 1;
-    // }
+    while(!file){
+        printf("could NOT open image 1. Please enter proper file:\n");
+        scanf("%s", argv[1]);
+        file = fopen(argv[1], "rb");
+        
+    }
 
 
-    // float ratio1 = atof(argv[3]);
+    while(!file2){
+        printf("could NOT open image 2. Please enter proper file:\n");
+        scanf("%s", argv[2]);
+        file2 = fopen(argv[2], "rb");
+        
+    }
 
-    // if(ratio1 > 1 || ratio1 < 0){
-    //     printf("ratio is out of bounds, chose a value between 0 and 1");
-    //     return 1;
-    // }
+    // need to ensure file is .bmp file
+    while(!res ){
+        printf("could NOT open output file");
+        scanf("%s", argv[4]);
+        file = fopen(argv[4], "rb");
+        
+    }
 
-    FILE *res = fopen("res.bmp", "wb");
+
+    float ratio1 = atof(argv[3]);
+
+   // checking if ratio is a number
+   while( ( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0){
+        printf("ratio input is not a decimal between 0 and 1! try again:\n");
+        scanf("%s", argv[3]);
+        ratio1 = atof(argv[3]);
+
+   }
+
+    
+
+    // FILE *res = fopen("res.bmp", "wb");
 
 
-    float ratio1 = 0.5;
+    // float ratio1 = 0.5;
 
-    FILE *file = fopen("wolf.bmp", "rb");
-    FILE *file2 = fopen("lion.bmp", "rb");
+    // FILE *file = fopen("wolf.bmp", "rb");
+    // FILE *file2 = fopen("lion.bmp", "rb");
 
     BITMAPFILEHEADER bfh1;
     BITMAPINFOHEADER bih1;
@@ -316,7 +329,7 @@ int main(int argc, char *argv[]){
 
 
 
-    printf("size1: %d size2: %d and resSize: %d\n", size1, size2, resSize);
+    // printf("size1: %d size2: %d and resSize: %d\n", size1, size2, resSize);
 
 
     Byte* result = diff3(idata, idata2, resPiWidth,width1,  width2, height1, height2, ratio1);

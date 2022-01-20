@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": [],
+            "args": ["lion.bpp", "jar.bmp", "0.4", "res.bmp"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
