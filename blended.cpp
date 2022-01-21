@@ -311,6 +311,7 @@ int main(int argc, char *argv[]){
     FILE *res = fopen(pathRes, "wb");
 
     while( !file    || extension(path1) == 'n' ){
+        delete[] path1;
         path1 = new char[100];
         do{
             cout << "img1.bmp" << endl;
@@ -318,14 +319,14 @@ int main(int argc, char *argv[]){
         } while( extension(path1) == 'n');
         
         file = fopen(path1, "rb");
-        // delete[] path1;
+        
     }
 
     rewind(file);
 
 
     while(!file2 || extension(path2) == 'n'){
-        
+        delete[] path2;
         path2 = new char[100];
         
         do{
@@ -334,14 +335,14 @@ int main(int argc, char *argv[]){
         } while( extension(path2) == 'n');
         
         file2 = fopen(path2, "rb");
-        // delete[] path2;
+        
     }
 
     rewind(file2);
 
     // need to ensure file is .bmp file
     while( !res || extension(pathRes) == 'n'){
-        
+        delete[] pathRes;
         pathRes = new char[100];
         
         do{
@@ -354,7 +355,7 @@ int main(int argc, char *argv[]){
         
         res = fopen(pathRes, "wb");
         
-        // delete[] pathRes;
+        
         
     }
 
@@ -366,7 +367,7 @@ int main(int argc, char *argv[]){
    // checking if ratio is a number
    while( ( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0){
         printf("ratio input is not a decimal between 0 and 1! try again:\n");
-        
+        delete[] strRatio;
         strRatio = new char[100];
         do{
 cout << "ratio" << endl;
@@ -374,7 +375,7 @@ cout << "ratio" << endl;
         ratio1 = atof(strRatio);
         } while(( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0);
         
-        // delete[] strRatio;
+        
 
    }
 
