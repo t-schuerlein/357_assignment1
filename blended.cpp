@@ -228,36 +228,71 @@ int main(int argc, char *argv[]){
     // argument handling
     while(argc < 5){
         printf("not enough arguments: %d. Input: [img1].bmp [img2].bmp ratio [output].bmp\n", argc);
-        scanf("%s %s %s %s", argv[1], argv[2], argv[3], argv[4]);
+        cout << "img1.bmp" << endl;
+        argv[1] = new char[100];
+        cin >> argv[1];
+
+        cout << "img2.bmp" << endl;
+        argv[2] = new char[100];
+        cin >> argv[2];
+
+        cout << "ratio" << endl;
+        argv[3] = new char[100];
+        cin >> argv[3];
+
+        cout << "outputfile.bmp" << endl;
+        argv[4] = new char[100];
+        cin >> argv[4];
+
+        argc = 5;
+
     }
     while(argc > 5){
         printf("too many arguments. Input: [img1].bmp [img2].bmp ratio [output].bmp\n");
-        scanf("%s %s %s %s", argv[1], argv[2], argv[3], argv[4]);
+        cout << "img1.bmp" << endl;
+        argv[1] = new char[100];
+        cin >> argv[1];
+
+        cout << "img2.bmp" << endl;
+        argv[2] = new char[100];
+        cin >> argv[2];
+
+        cout << "ratio" << endl;
+        argv[3] = new char[100];
+        cin >> argv[3];
+
+        cout << "outputfile.bmp" << endl;
+        argv[4] = new char[100];
+        cin >> argv[4];
+
     }
     FILE *file = fopen(argv[1], "rb");
     FILE *file2 = fopen(argv[2], "rb");
     FILE *res = fopen(argv[4], "wb");
 
     while(!file){
-        printf("could NOT open image 1. Please enter proper file:\n");
-        scanf("%s", argv[1]);
+        cout << "img1.bmp" << endl;
+        argv[1] = new char[100];
+        cin >> argv[1];
         file = fopen(argv[1], "rb");
         
     }
 
 
     while(!file2){
-        printf("could NOT open image 2. Please enter proper file:\n");
-        scanf("%s", argv[2]);
+        cout << "img2.bmp" << endl;
+        argv[2] = new char[100];
+        cin >> argv[2];
         file2 = fopen(argv[2], "rb");
         
     }
 
     // need to ensure file is .bmp file
     while(!res ){
-        printf("could NOT open output file");
-        scanf("%s", argv[4]);
-        file = fopen(argv[4], "rb");
+        cout << "outputfile.bmp" << endl;
+        argv[4] = new char[100];
+        cin >> argv[4];
+        file = fopen(argv[4], "wb");
         
     }
 
@@ -267,7 +302,9 @@ int main(int argc, char *argv[]){
    // checking if ratio is a number
    while( ( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0){
         printf("ratio input is not a decimal between 0 and 1! try again:\n");
-        scanf("%s", argv[3]);
+        cout << "ratio" << endl;
+        argv[3] = new char[100];
+        cin >> argv[3];
         ratio1 = atof(argv[3]);
 
    }
