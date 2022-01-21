@@ -12,7 +12,11 @@ char extension(char * file){
    char* iter = file;
   // get to extension section
   while( (*iter) != '.'){
+    
     iter = iter + 1; 
+    if((*iter) == '\0'){
+        return 'n';
+    }
   }
 
   char* bmp = "bmp";
@@ -306,48 +310,55 @@ int main(int argc, char *argv[]){
     FILE *file2 = fopen(path2, "rb");
     FILE *res = fopen(pathRes, "wb");
 
-    while( !file     ){
-        cout << "img1.bmp" << endl;
+    while( !file    || extension(path1) == 'n' ){
         path1 = new char[100];
-        
         do{
+            cout << "img1.bmp" << endl;
             cin >> path1;
         } while( extension(path1) == 'n');
-
+        
         file = fopen(path1, "rb");
         // delete[] path1;
-        rewind(file);
-        
     }
 
+    rewind(file);
 
-    while(!file2   ){
-        cout << "img2.bmp" << endl;
+
+    while(!file2 || extension(path2) == 'n'){
+        
         path2 = new char[100];
         
         do{
+            cout << "img2.bmp" << endl;
             cin >> path2;
         } while( extension(path2) == 'n');
-
+        
         file2 = fopen(path2, "rb");
         // delete[] path2;
-        rewind(file2);
-        
     }
+
+    rewind(file2);
 
     // need to ensure file is .bmp file
     while( !res || extension(pathRes) == 'n'){
-        cout << "input proper outfile name:" << endl;
+        
         pathRes = new char[100];
         
         do{
+            cout << "input proper outfile name:" << endl;
             cin >> pathRes;
         } while( extension(pathRes) == 'n');
-
+        if(res){
+            fclose(res);
+        }
+        
         res = fopen(pathRes, "wb");
+        
         // delete[] pathRes;
-        rewind(res);
+        
     }
+
+    rewind(res);
 
 
     float ratio1 = atof(strRatio);
@@ -355,10 +366,14 @@ int main(int argc, char *argv[]){
    // checking if ratio is a number
    while( ( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0){
         printf("ratio input is not a decimal between 0 and 1! try again:\n");
-        cout << "ratio" << endl;
+        
         strRatio = new char[100];
+        do{
+cout << "ratio" << endl;
         cin >> strRatio;
         ratio1 = atof(strRatio);
+        } while(( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0);
+        
         // delete[] strRatio;
 
    }
@@ -433,11 +448,11 @@ int main(int argc, char *argv[]){
 
     fwrite(result, resSize, 1, res);
 
-
     delete[] path1;
     delete[] path2;
     delete[] strRatio;
     delete[] pathRes;
+    
 
     delete[] idata;
     delete[] idata2;
