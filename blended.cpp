@@ -7,6 +7,28 @@
 using namespace std;
 
 //TODO argument handling do we just want to kill the program if bad arguments??
+// returning 'y' means "yes the extension ends with .bmp"
+char extension(char * file){
+   char* iter = file;
+  // get to extension section
+  while( (*iter) != '.'){
+    iter = iter + 1; 
+  }
+
+  char* bmp = "bmp";
+  iter = iter + 1;
+  int index = 0;
+  while(index < 3 && bmp[index] == iter[index]){
+    index += 1;
+  }
+
+  
+
+  if( index == 3){
+    return 'y';
+  }
+  return 'n';
+}
 
 
 
@@ -222,27 +244,34 @@ unsigned char* diff3(unsigned char *idata, unsigned char *idata2, int piWidth, i
 int main(int argc, char *argv[]){
 
 
+    char* path1 = argv[1];
+    char* path2 = argv[2];
+    char* strRatio = argv[3];
+    char* pathRes = argv[4];
+
     //print out of explanation
     printf("\n\nThis is an image blender program. The program requires the following terminal arguments:\nprogramName, img1.bmp, img2.bmp, ratio, outputFileName.bmp\nThe ratio will tell the program what percent of the first image will go into the output and the rest of the blend will consist of the second image.\n\n");
 
-    // argument handling
+    // // argument handling
     while(argc < 5){
         printf("not enough arguments: %d. Input: [img1].bmp [img2].bmp ratio [output].bmp\n", argc);
         cout << "img1.bmp" << endl;
-        argv[1] = new char[100];
-        cin >> argv[1];
+        path1 = new char[100];
+        cin >> path1;
 
         cout << "img2.bmp" << endl;
-        argv[2] = new char[100];
-        cin >> argv[2];
+        path2 = new char[100];
+        cin >> path2;
 
         cout << "ratio" << endl;
-        argv[3] = new char[100];
-        cin >> argv[3];
+        strRatio= new char[100];
+        cin >> strRatio;
 
         cout << "outputfile.bmp" << endl;
-        argv[4] = new char[100];
-        cin >> argv[4];
+        pathRes = new char[100];
+        cin >> pathRes;
+
+      
 
         argc = 5;
 
@@ -250,62 +279,87 @@ int main(int argc, char *argv[]){
     while(argc > 5){
         printf("too many arguments. Input: [img1].bmp [img2].bmp ratio [output].bmp\n");
         cout << "img1.bmp" << endl;
-        argv[1] = new char[100];
-        cin >> argv[1];
+        path1 = new char[100];
+        cin >> path1;
 
         cout << "img2.bmp" << endl;
-        argv[2] = new char[100];
-        cin >> argv[2];
+        path2 = new char[100];
+        cin >> path2;
 
         cout << "ratio" << endl;
-        argv[3] = new char[100];
-        cin >> argv[3];
+        strRatio= new char[100];
+        cin >> strRatio;
 
         cout << "outputfile.bmp" << endl;
-        argv[4] = new char[100];
-        cin >> argv[4];
+        pathRes = new char[100];
+        cin >> pathRes;
+
+
+    
+
+        argc = 5;
+
+
 
     }
-    FILE *file = fopen(argv[1], "rb");
-    FILE *file2 = fopen(argv[2], "rb");
-    FILE *res = fopen(argv[4], "wb");
+    FILE *file = fopen(path1, "rb");
+    FILE *file2 = fopen(path2, "rb");
+    FILE *res = fopen(pathRes, "wb");
 
-    while(!file){
+    while( !file     ){
         cout << "img1.bmp" << endl;
-        argv[1] = new char[100];
-        cin >> argv[1];
-        file = fopen(argv[1], "rb");
+        path1 = new char[100];
+        
+        do{
+            cin >> path1;
+        } while( extension(path1) == 'n');
+
+        file = fopen(path1, "rb");
+        // delete[] path1;
+        rewind(file);
         
     }
 
 
-    while(!file2){
+    while(!file2   ){
         cout << "img2.bmp" << endl;
-        argv[2] = new char[100];
-        cin >> argv[2];
-        file2 = fopen(argv[2], "rb");
+        path2 = new char[100];
+        
+        do{
+            cin >> path2;
+        } while( extension(path2) == 'n');
+
+        file2 = fopen(path2, "rb");
+        // delete[] path2;
+        rewind(file2);
         
     }
 
     // need to ensure file is .bmp file
-    while(!res ){
-        cout << "outputfile.bmp" << endl;
-        argv[4] = new char[100];
-        cin >> argv[4];
-        file = fopen(argv[4], "wb");
+    while( !res || extension(pathRes) == 'n'){
+        cout << "input proper outfile name:" << endl;
+        pathRes = new char[100];
         
+        do{
+            cin >> pathRes;
+        } while( extension(pathRes) == 'n');
+
+        res = fopen(pathRes, "wb");
+        // delete[] pathRes;
+        rewind(res);
     }
 
 
-    float ratio1 = atof(argv[3]);
+    float ratio1 = atof(strRatio);
 
    // checking if ratio is a number
    while( ( ratio1 == 0 && argv[3] != "0")  || ratio1 > 1.0 || ratio1 < 0.0){
         printf("ratio input is not a decimal between 0 and 1! try again:\n");
         cout << "ratio" << endl;
-        argv[3] = new char[100];
-        cin >> argv[3];
-        ratio1 = atof(argv[3]);
+        strRatio = new char[100];
+        cin >> strRatio;
+        ratio1 = atof(strRatio);
+        // delete[] strRatio;
 
    }
 
@@ -358,8 +412,6 @@ int main(int argc, char *argv[]){
     fread(idata, size1, 1, file);
 
 
-    
-
     int size2 = width2 * height2;
     Byte *idata2 = new Byte[ size2];
     fread(idata2, size2, 1, file2);
@@ -381,6 +433,11 @@ int main(int argc, char *argv[]){
 
     fwrite(result, resSize, 1, res);
 
+
+    delete[] path1;
+    delete[] path2;
+    delete[] strRatio;
+    delete[] pathRes;
 
     delete[] idata;
     delete[] idata2;

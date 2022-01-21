@@ -1,5 +1,4 @@
-
-    if(ratio1 > 1 || ratio1 < 0){
-        printf("ratio is out of bounds, chose a value between 0 and 1");
-        return 1;
-    }
+delete[] path1;
+    delete[] argv[2];
+    delete[] argv[3];
+    delete[] argv[4];
