@@ -253,8 +253,10 @@ int main(int argc, char *argv[]){
     char* strRatio = argv[3];
     char* pathRes = argv[4];
 
+    int usePath = 0;
+
     //print out of explanation
-    printf("\n\nThis is an image blender program. The program requires the following terminal arguments:\nprogramName, img1.bmp, img2.bmp, ratio, outputFileName.bmp\nThe ratio will tell the program what percent of the first image will go into the output and the rest of the blend will consist of the second image.\n\n");
+    printf("\n\nThis is an image blender program. The program requires the following terminal arguments:\nprogramName, img1.bmp, img2.bmp, ratio, outputFileName.bmp\nThe ratio will tell the program what percent of the first image will go into the output and the rest of the blend\nwill consist of the second image.\n\n");
 
     // // argument handling
     while(argc < 5){
@@ -276,7 +278,7 @@ int main(int argc, char *argv[]){
         cin >> pathRes;
 
       
-
+    usePath = 1;
         argc = 5;
 
     }
@@ -299,7 +301,7 @@ int main(int argc, char *argv[]){
         cin >> pathRes;
 
 
-    
+    usePath = 1;
 
         argc = 5;
 
@@ -311,30 +313,36 @@ int main(int argc, char *argv[]){
     FILE *res = fopen(pathRes, "wb");
 
     while( !file    || extension(path1) == 'n' ){
-        delete[] path1;
+        if(path1){
+            delete[] path1;
+        }
         path1 = new char[100];
         do{
-            cout << "img1.bmp" << endl;
+            cout << "bad input. Re-enter img1.bmp" << endl;
             cin >> path1;
         } while( extension(path1) == 'n');
         
         file = fopen(path1, "rb");
-        
+        delete[] path1;
     }
 
     rewind(file);
 
 
     while(!file2 || extension(path2) == 'n'){
-        delete[] path2;
+        if(path2){
+            delete[] path2;
+        }
+        
         path2 = new char[100];
         
         do{
-            cout << "img2.bmp" << endl;
+            cout << "bad input. Re-enter img2.bmp" << endl;
             cin >> path2;
         } while( extension(path2) == 'n');
         
         file2 = fopen(path2, "rb");
+        delete[] path2;
         
     }
 
@@ -342,7 +350,9 @@ int main(int argc, char *argv[]){
 
     // need to ensure file is .bmp file
     while( !res || extension(pathRes) == 'n'){
-        delete[] pathRes;
+        if(pathRes){
+            delete[] pathRes;
+        }
         pathRes = new char[100];
         
         do{
@@ -354,6 +364,7 @@ int main(int argc, char *argv[]){
         }
         
         res = fopen(pathRes, "wb");
+        delete[] pathRes;
         
         
         
@@ -449,10 +460,14 @@ cout << "ratio" << endl;
 
     fwrite(result, resSize, 1, res);
 
-    delete[] path1;
+
+    if(usePath == 1){
+        delete[] path1;
     delete[] path2;
     delete[] strRatio;
     delete[] pathRes;
+    }
+    
     
 
     delete[] idata;
